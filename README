@@ -1,0 +1,4 @@
+Highcharts [http://www.highcharts.com/] 的 QWrap 适配
+
+使 Highcharts 支持 QWrap (core_dom_pure)
+修改了全部的examples通过测试

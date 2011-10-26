@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Highcharts Example</title>
+		
+		
+		<!-- 1. Add these JavaScript inclusions in the head of your page -->
+		<!--
+			<script type="text/javascript" src="../lib/jquery-1.6.2.js"></script>
+		-->
+
+		
+		
+		<script type="text/javascript" src="../lib/core_dom_retouched.combo.js"></script>
+		<script type="text/javascript" src="../lib/anim.combo.js"></script>
+		<script type="text/javascript" src="../js/adapters/qwrap-adapter.src.js"></script>
+		
+		<script type="text/javascript" src="../js/highcharts.src.js"></script>
+		
+		<!-- 1a) Optional: add a theme file -->
+		<!--
+			<script type="text/javascript" src="../js/themes/gray.js"></script>
+		-->
+		
+		<!-- 1b) Optional: the exporting module -->
+		<script type="text/javascript" src="../js/modules/exporting.js"></script>
+		
+		
+		<!-- 2. Add the JavaScript to initialize the chart on document ready -->
+		<script type="text/javascript">
+			var W = QW.NodeW, g = QW.Dom.g;
+			/**
+			 * Visualize an HTML table using Highcharts. The top (horizontal) header 
+			 * is used for series names, and the left (vertical) header is used 
+			 * for category names. This function is based on jQuery.
+			 * @param {Object} table The reference to the HTML table to visualize
+			 * @param {Object} options Highcharts options
+			 */
+			Highcharts.visualize = function(table, options) {
+				// the categories
+				options.xAxis.categories = [];
+				//$('tbody th', table).each( function(i) {
+				W('tbody th', table).forEach( function(o) {
+					options.xAxis.categories.push(o.innerHTML);
+				});
+				
+				// the data series
+				options.series = [];
+				//$('tr', table).each( function(i) {
+				W('tr', table).forEach( function(tr,i) {
+					//$('th, td', tr).each( function(j) {
+					W('th, td', tr).forEach( function(o,j) {
+						if (j > 0) { // skip first column
+							if (i == 0) { // get the name and init the series
+								options.series[j - 1] = { 
+									name: this.innerHTML,
+									data: []
+								};
+							} else { // add values
+								options.series[j - 1].data.push(parseFloat(o.innerHTML));
+							}
+						}
+					});
+				});
+				
+				var chart = new Highcharts.Chart(options);
+			}
+				
+			// On document ready, call visualize on the datatable.
+			//$(document).ready(function() {			
+			QW.Dom.ready(function() { 
+				var table = document.getElementById('datatable'),
+				options = {
+					   chart: {
+					      renderTo: 'container',
+					      defaultSeriesType: 'column'
+					   },
+					   title: {
+					      text: 'Data extracted from a HTML table in the page'
+					   },
+					   xAxis: {
+					   },
+					   yAxis: {
+					      title: {
+					         text: 'Units'
+					      }
+					   },
+					   tooltip: {
+					      formatter: function() {
+					         return '<b>'+ this.series.name +'</b><br/>'+
+					            this.y +' '+ this.x.toLowerCase();
+					      }
+					   }
+					};
+				
+			      					
+				Highcharts.visualize(table, options);
+			});
+				
+		</script>
+		
+	</head>
+	<body>
+		
+		<!-- 3. Add the container -->
+		<div id="container" style="width: 800px; height: 400px; margin: 0 auto"></div>
+		
+		
+		<table id="datatable">
+			<thead>
+				<tr>
+					<th></th>
+					<th>Jane</th>
+					<th>John</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th>Apples</th>
+					<td>3</td>
+					<td>4</td>
+				</tr>
+				<tr>
+					<th>Pears</th>
+					<td>2</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Plums</th>
+					<td>5</td>
+					<td>11</td>
+				</tr>
+				<tr>
+					<th>Bananas</th>
+					<td>1</td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<th>Oranges</th>
+					<td>2</td>
+					<td>4</td>
+				</tr>
+			</tbody>
+		</table>
+		
+			
+	</body>
+</html>
