@@ -1,6 +1,6 @@
 /**
  * @license @product.name@ JS v@product.version@ (@product.date@)
- * Prototype adapter
+ * QWrap adapter
  *
  * @author Akira , WED Team
  *
