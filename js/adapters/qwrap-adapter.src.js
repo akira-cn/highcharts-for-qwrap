@@ -15,7 +15,7 @@ var AH = QW.ArrayH,
 	CEH = QW.CustEventTargetH,
 	Dom = QW.Dom,
 	Anim = QW.Anim,
-	Easing = QW.ElAnim.Easing,
+	Easing = QW.Easing,
 	mix = QW.ObjectH.mix;
 
 var _pathAnim;
@@ -27,6 +27,26 @@ HighchartsAdapter = {
 	 */
 	init: function (pathAnim) {
 		_pathAnim = pathAnim;
+	},
+	/**
+	 * Run a general method on the framework, following jQuery syntax
+	 * @param {Object} el The HTML element
+	 * @param {String} method Which method to run on the wrapped element
+	 */
+	adapterRun: function (el, method) {
+		
+		// This currently works for getting inner width and height. If adding
+		// more methods later, we need a conditional implementation for each.
+		return parseInt(W(el).css(method), 10);
+	},
+	/**
+	 * Downloads a script and executes a callback when done.
+	 * @param {String} scriptLocation
+	 * @param {Function} callback
+	 */
+	getScript: function (scriptLocation, callback) {
+		// We cannot assume that Assets class from mootools-more is available so instead insert a script tag to download script.
+		return QW.loadJs(scriptLocation, callback);
 	},
 	each  :  AH.forEach,
 	grep  :  AH.filter,
@@ -102,13 +122,9 @@ HighchartsAdapter = {
 		for (var key in params) {
 			attrs[key] = {from: el.attr(key) || 0, to:params[key]};
 		}
-		if(el.__anim){
-			el.__anim.cancel();
-			el.__anim = null;
-		}
+		HighchartsAdapter.stop(el);
 
 		function step(per) {
-			//console.log([per, key, from + easing(per, to-from)]);
 			for(var key in attrs){
 				if('d' == key){
 					if(attrs[key].from){
@@ -118,22 +134,39 @@ HighchartsAdapter = {
 						el.attr(key, attrs[key].to);
 					}
 				}else{
-					el.attr(key, attrs[key].from + easing(per, attrs[key].to-attrs[key].from));
+					el.attr(key, attrs[key].from + easing(per) * (attrs[key].to-attrs[key].from));
 				}
 			}
 		}
 		var anim = new Anim(step,dur);
+
 		if(callback){
 			anim.on('end', callback);
 		}
-		el.__anim = anim;
-		anim.start();
+		
+		setTimeout(function(){
+			el.__anim = anim;
+			anim.play();
+		});
 	},
 	stop : function(el){
 		if(el.__anim){
-			el.__anim.cancel();
+			el.__anim.end();
 			el.__anim = null;
 		}
-	}
+	},
+	/**
+	 * Get the offset of an element relative to the top left corner of the web page
+	 */
+	offset: function (el) {
+		var offsets = W(el).getXY();
+		return {
+			left: offsets[0],
+			top: offsets[1]
+		};
+	},
+	washMouseEvent: function (e) {
+		return e;
+	},
 }
 })();
